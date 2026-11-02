@@ -1,0 +1,7 @@
+line-length = 120
+target-version = "py312"
+src = ["etl"]
+
+[lint]
+# Erros reais (F, E) + imports organizados (I). Sem frescura de estilo além disso.
+select = ["E4", "E7", "E9", "F", "I"]

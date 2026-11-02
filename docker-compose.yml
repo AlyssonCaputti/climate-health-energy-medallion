@@ -6,23 +6,29 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # Na primeira subida, o Postgres roda esse script e cria as camadas bronze/silver/gold.
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
+      # "Container de pé" não é "banco pronto". Quem depende do banco espera esse check passar.
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 3s
       retries: 10
+
   adminer:
     image: adminer
     ports:
       - "8080:8080"
     depends_on:
       - db
+
   etl:
     build: ./etl
     env_file: .env
+    # É um job, não um servidor: não sobe no "up", só quando eu chamo com "run".
+    profiles: ["job"]
     volumes:
-      - ./etl:/app
-      - ./data:/data
+      - ./etl:/app    # edito no VS Code e rodo na hora, sem rebuild
+      - ./data:/data  # arquivos grandes baixados ficam no disco local, fora do container
     depends_on:
       db:
         condition: service_healthy

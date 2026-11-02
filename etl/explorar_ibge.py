@@ -1,3 +1,8 @@
+"""Rascunho de exploração: o primeiro olhar que dei na API do IBGE antes de modelar qualquer coisa.
+
+Deixo aqui de propósito. Foi rodando isso que achei o município sem microrregião.
+"""
+
 import pandas as pd
 import requests
 
@@ -13,6 +18,7 @@ print("Tipo:", type(dados))
 print("Quantidade:", len(dados))
 print("Primeiro item:", dados[0])
 
+# Meu checklist de toda fonte nova: formato, colunas, tipos e nulos.
 df = pd.json_normalize(dados)
 print("\nFormato:", df.shape)
 print("\nColunas:")
