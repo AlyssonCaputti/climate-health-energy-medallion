@@ -23,7 +23,7 @@ def adicionar_lags(df):
 
 def calcular_adocao_mensal(inst, pop):
     inst = inst.copy()
-    inst["mes"] = inst["data_conexao"].dt.to_period("M").dt.to_timestamp()
+    inst["mes"] = inst["data_cadastro"].dt.to_period("M").dt.to_timestamp()
     mensal = (
         inst.groupby(["cod_municipio", "mes"])
         .agg(novas_instalacoes=("potencia_kw", "size"), nova_potencia_kw=("potencia_kw", "sum"))
@@ -55,7 +55,7 @@ def construir_dengue_features(engine):
 
 
 def construir_solar_adocao_mensal(engine):
-    inst = pd.read_sql("SELECT cod_municipio, data_conexao, potencia_kw FROM silver.fato_solar_instalacao", engine)
+    inst = pd.read_sql("SELECT cod_municipio, data_cadastro, potencia_kw FROM silver.fato_solar_instalacao", engine)
     # Reaproveito a população que já vem no InfoDengue: uma fonte a menos pra manter.
     pop = pd.read_sql(
         "SELECT DISTINCT ON (cod_municipio) cod_municipio, populacao "

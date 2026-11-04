@@ -38,7 +38,9 @@ COLUNAS_DENGUE = {
 COLUNAS_SOLAR = {
     "codempreendimento": "cod_empreendimento",
     "codmunicipioibge": "cod_municipio",
-    "dthatualizacadastralempreend": "data_conexao",
+    # O arquivo não tem data de conexão. A única data é a da última atualização cadastral,
+    # e é ela que uso como aproximação do momento da instalação (ver README).
+    "dthatualizacadastralempreend": "data_cadastro",
     "dscclasseconsumo": "classe_consumo",
     "sigtipoconsumidor": "tipo_consumidor",
     "dscporte": "porte",
@@ -92,7 +94,7 @@ def transformar_fato_solar(bronze):
     fato = solar[list(COLUNAS_SOLAR)].rename(columns=COLUNAS_SOLAR)
 
     fato["cod_municipio"] = pd.to_numeric(fato["cod_municipio"], errors="coerce").astype("Int64")
-    fato["data_conexao"] = pd.to_datetime(fato["data_conexao"], errors="coerce")
+    fato["data_cadastro"] = pd.to_datetime(fato["data_cadastro"], errors="coerce")
     # Decimal brasileiro: "32,50" → 32.5. E ",48" (sem o zero) também vira 0.48.
     fato["potencia_kw"] = pd.to_numeric(fato["potencia_kw"].str.replace(",", "."), errors="coerce")
     fato["ucs_credito"] = pd.to_numeric(fato["ucs_credito"], errors="coerce").astype("Int64")

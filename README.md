@@ -121,6 +121,7 @@ O modelo diz que a maioria dos municípios está perto da saturação (~88%). Eu
 | ANEEL | Arquivo de 1,5 GB descompactado | Leio direto do zip, em pedaços de 200 mil linhas |
 | ANEEL | Potência como `",48"` (sem o zero) e decimal com vírgula | Converto no silver, com teste cobrindo o caso |
 | ANEEL | 6 instalações cadastradas com `",00"` kW | Removo e registro quantas saíram |
+| ANEEL | Não existe data de conexão; a única data é `DthAtualizaCadastralEmpreend` (última atualização cadastral) | Uso como aproximação, com o nome honesto `data_cadastro`. Recadastramentos em massa podem deslocar a curva do Bass |
 
 As regras de limpeza do silver (decimal brasileiro, potência zero, duplicatas, granularidade) viraram testes em [`etl/tests`](etl/tests).
 

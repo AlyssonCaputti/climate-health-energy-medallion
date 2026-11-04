@@ -22,7 +22,7 @@ def test_lags_nao_vazam_entre_municipios():
 def test_adocao_preenche_meses_vazios_e_acumula():
     inst = pd.DataFrame({
         "cod_municipio": [1, 1],
-        "data_conexao": pd.to_datetime(["2024-01-10", "2024-03-20"]),  # fevereiro sem nada
+        "data_cadastro": pd.to_datetime(["2024-01-10", "2024-03-20"]),  # fevereiro sem nada
         "potencia_kw": [5.0, 10.0],
     })
     pop = pd.DataFrame({"cod_municipio": [1], "populacao": [1000]})
