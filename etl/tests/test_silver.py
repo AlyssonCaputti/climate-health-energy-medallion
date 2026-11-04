@@ -27,7 +27,7 @@ def test_dim_municipio_limpa_nomes():
 
 
 def test_dim_municipio_barra_codigo_duplicado():
-    with pytest.raises(AssertionError, match="duplicado"):
+    with pytest.raises(ValueError, match="duplicado"):
         transformar_dim_municipio(bronze_municipios([1, 1], ["A", "B"]))
 
 
@@ -60,7 +60,7 @@ def test_fato_dengue_aceita_clima_faltando():
 
 
 def test_fato_dengue_barra_casos_negativos():
-    with pytest.raises(AssertionError, match="negativos"):
+    with pytest.raises(ValueError, match="negativos"):
         transformar_fato_dengue(bronze_dengue(casos=-1))
 
 

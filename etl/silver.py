@@ -50,14 +50,20 @@ COLUNAS_SOLAR = {
 # --- transformações puras: entram DataFrames, saem DataFrames. É isso que os testes cobrem. ---
 
 
+def validar(condicao, mensagem):
+    # Não uso assert: com "python -O" ele some e o dado sujo passa direto pro gold.
+    if not condicao:
+        raise ValueError(mensagem)
+
+
 def transformar_dim_municipio(bronze):
     # Uso a hierarquia "região imediata" (IBGE 2017). A antiga (microrregião) vem nula
     # para Boa Esperança do Norte/MT, município criado em 2025.
     dim = bronze[list(COLUNAS_MUNICIPIO)].rename(columns=COLUNAS_MUNICIPIO)
     dim["municipio"] = dim["municipio"].str.strip()
 
-    assert dim["cod_municipio"].is_unique, "cod_municipio duplicado"
-    assert dim.notna().all().all(), "dim_municipio com nulos"
+    validar(dim["cod_municipio"].is_unique, "cod_municipio duplicado")
+    validar(dim.notna().all().all(), "dim_municipio com nulos")
     return dim
 
 
@@ -73,10 +79,10 @@ def transformar_fato_dengue(bronze):
     fato = fato.drop_duplicates(subset=["cod_municipio", "semana_epi"])
     fato = fato.sort_values(["cod_municipio", "data_inicio_semana"]).reset_index(drop=True)
 
-    # Clima fica fora do assert: ~1% das semanas não tem estação, e tudo bem.
+    # Clima fica fora da validação: ~1% das semanas não tem estação, e tudo bem.
     chaves = ["cod_municipio", "semana_epi", "casos_notificados"]
-    assert fato[chaves].notna().all().all(), "chave ou casos nulos"
-    assert (fato["casos_notificados"] >= 0).all(), "casos negativos"
+    validar(fato[chaves].notna().all().all(), "chave ou casos nulos")
+    validar((fato["casos_notificados"] >= 0).all(), "casos negativos")
     return fato
 
 
@@ -97,8 +103,8 @@ def transformar_fato_solar(bronze):
     print(f"removidas {invalidas.sum()} instalações com potência <= 0")
     fato = fato[~invalidas].reset_index(drop=True)
 
-    assert fato["cod_municipio"].notna().all(), "município nulo"
-    assert (fato["potencia_kw"] > 0).all(), "potência inválida"
+    validar(fato["cod_municipio"].notna().all(), "município nulo")
+    validar((fato["potencia_kw"] > 0).all(), "potência inválida")
     return fato
 
 
