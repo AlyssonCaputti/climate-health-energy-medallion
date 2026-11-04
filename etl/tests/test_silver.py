@@ -64,12 +64,12 @@ def test_fato_dengue_barra_casos_negativos():
         transformar_fato_dengue(bronze_dengue(casos=-1))
 
 
-def bronze_solar(potencias, tipos=None):
+def bronze_solar(potencias, tipos=None, datas=None):
     n = len(potencias)
     return pd.DataFrame({
         "codempreendimento": [f"GD.PR.{i}" for i in range(n)],
         "codmunicipioibge": "4106902",
-        "dthatualizacadastralempreend": "2024-03-15",
+        "dthatualizacadastralempreend": datas or ["2024-03-15"] * n,
         "dscclasseconsumo": "Residencial",
         "sigtipoconsumidor": "PF",
         "dscporte": "Microgeracao",
@@ -93,3 +93,8 @@ def test_fato_solar_remove_potencia_zero():
 def test_fato_solar_so_fotovoltaica():
     fato = transformar_fato_solar(bronze_solar(["5,00", "100,00"], tipos=["UFV", "UTE"]))
     assert len(fato) == 1
+
+
+def test_fato_solar_remove_data_invalida():
+    fato = transformar_fato_solar(bronze_solar(["5,00", "7,00"], datas=["2024-03-15", "sem data"]))
+    assert fato["potencia_kw"].tolist() == [5.0]

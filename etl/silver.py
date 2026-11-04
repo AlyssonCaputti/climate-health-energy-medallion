@@ -105,6 +105,11 @@ def transformar_fato_solar(bronze):
     print(f"removidas {invalidas.sum()} instalações com potência <= 0")
     fato = fato[~invalidas].reset_index(drop=True)
 
+    # Data que não converteu vira NaT, e o groupby mensal do gold descartaria a linha calado.
+    sem_data = fato["data_cadastro"].isna()
+    print(f"removidas {sem_data.sum()} instalações com data inválida")
+    fato = fato[~sem_data].reset_index(drop=True)
+
     validar(fato["cod_municipio"].notna().all(), "município nulo")
     validar((fato["potencia_kw"] > 0).all(), "potência inválida")
     return fato
