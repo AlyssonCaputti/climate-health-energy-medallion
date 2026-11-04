@@ -49,7 +49,9 @@ def ajustar_bass(y):
 def modelo_dengue_clima(engine):
     df = pd.read_sql("SELECT * FROM gold.dengue_features", engine)
     lags_clima = [f"{v}_lag{lag}" for v in ("temp_med", "umid_med") for lag in LAGS]
-    df = df.dropna(subset=lags_clima + ["casos_lag1"])
+    df = df.dropna(subset=lags_clima + ["casos_lag1", "populacao"])
+    # O offset é log(população): zero viraria -inf e contaminaria o ajuste inteiro.
+    df = df[df["populacao"] > 0]
 
     X = pd.concat([base_polinomial(df, "temp_med"), base_polinomial(df, "umid_med")], axis=1)
     X["log_casos_lag1"] = np.log1p(df["casos_lag1"])  # inércia da epidemia
