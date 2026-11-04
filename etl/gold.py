@@ -9,15 +9,22 @@ from db import get_engine
 LAGS_CLIMA = range(1, 9)
 
 
+def semanas_atras(df, coluna, n):
+    # Busco pela data, não pela posição: se faltar uma semana na série, o lag não escorrega.
+    # A chave inclui o município, então a última semana de um não vaza pro próximo.
+    chave = ["cod_municipio", "data_inicio_semana"]
+    passado = df[chave + [coluna]].copy()
+    passado["data_inicio_semana"] += pd.Timedelta(weeks=n)
+    return df[chave].merge(passado, on=chave, how="left")[coluna].to_numpy()
+
+
 def adicionar_lags(df):
     # O mosquito responde ao clima com semanas de atraso, então crio "o clima de N semanas atrás".
-    # O groupby é o que impede a última semana de um município vazar pro próximo.
-    df = df.sort_values(["cod_municipio", "data_inicio_semana"]).copy()
-    grupo = df.groupby("cod_municipio")
+    df = df.sort_values(["cod_municipio", "data_inicio_semana"]).reset_index(drop=True)
     for lag in LAGS_CLIMA:
-        df[f"temp_med_lag{lag}"] = grupo["temp_med"].shift(lag)
-        df[f"umid_med_lag{lag}"] = grupo["umid_med"].shift(lag)
-    df["casos_lag1"] = grupo["casos_notificados"].shift(1)
+        df[f"temp_med_lag{lag}"] = semanas_atras(df, "temp_med", lag)
+        df[f"umid_med_lag{lag}"] = semanas_atras(df, "umid_med", lag)
+    df["casos_lag1"] = semanas_atras(df, "casos_notificados", 1)
     return df
 
 
